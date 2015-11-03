@@ -1,0 +1,149 @@
+#include "RST.hpp"
+#include "countint.hpp"
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cstdlib>
+#include <math.h>
+#include <set>
+
+using namespace std;
+
+int main(int argc, char** argv) {
+    string structure;
+    string form;
+    int max;
+    int R;
+    int N = 1;
+    int j = 1;
+    //double avgcomps = 0;
+    //double avgsquare = 0;
+    //double stdDev = 0;
+    vector<countint> v;
+
+    structure = argv[1];
+    form = argv[2];
+    max = atoi(argv[3]);
+    R = atoi(argv[4]);
+
+    //First output line
+    cout << "# Benchmarking average number of comparisons for successful find" << endl;
+    
+    //bst, rst, or set from command line argument
+    cout << "# Data structure: " << structure << endl;
+
+    //input from command line - sorted or shuffled (randomized)
+    cout << "# Data: " << form  << endl;
+
+    //input from command line argument
+    cout << "# N is powers of 2, minus 1, from 1 to " << max << endl;
+
+  while (N < max - 1) {
+      N = pow(2,j) - 1;
+      j ++;     
+	double avgcomps = 0;
+    double avgsquare = 0;
+    double stdDev = 0;
+      /* Create an empty instance of countint */
+      if (structure == "rst") {   
+         for (int i = 0; i < R; i ++) { //Do the following for R runs if SHUFFLED
+	   RST<countint> s = RST<countint>();
+	   v.clear();
+	   for (int i = 0; i < N; ++ i)
+	     v.push_back(i);	 
+	   //Randomize vector if required to insert keys SHUFFLED
+	   if (form == "shuffled")
+	     std::random_shuffle(v.begin(), v.end());
+	   
+	   vector<countint>::iterator vit = v.begin();
+	   std::vector<countint>::iterator ven = v.end();
+
+	   for (vit = v.begin(); vit != ven; ++vit)
+	     s.insert(*vit);
+	   countint::clearcount();
+           for (vit = v.begin(); vit != ven; ++ vit)  //How many comparisons on avg to find key
+	     s.find(*vit);
+	   avgcomps += countint::getcount() / (double)N;
+           avgsquare += pow((countint::getcount() / (double)N),2);
+	   // s.delete();
+          }
+
+          avgcomps /= R;
+          avgsquare /= R;
+	  
+          //cout << "avgcomps " << avgcomps << "  avgsquare " << avgsquare << "  R " << R << endl;
+          stdDev = sqrt(avgsquare - pow(avgcomps,2)); //Finding standard deviation
+          //Printing out comparisons data
+          cout << N << "\t" << avgcomps << "\t" << stdDev << endl;
+
+      }
+      else if (structure == "bst"){   
+         for (int i = 0; i < R; i ++) { //Do the following for R runs if SHUFFLED
+	   BST<countint> s = BST<countint>();
+	   v.clear();
+	   for (int i = 0; i < N; ++ i)
+	     v.push_back(i);
+	   //Randomize vector if required to insert keys SHUFFLED
+	   if (form == "shuffled")
+	     std::random_shuffle(v.begin(), v.end());
+    
+	   std::vector<countint>::iterator vit = v.begin();
+	   std::vector<countint>::iterator ven = v.end();
+
+	   for (vit = v.begin(); vit != ven; ++vit)
+	     s.insert(*vit);
+
+	   countint::clearcount();
+	   for (vit = v.begin(); vit != ven; ++ vit)  //How many comparisons on avg to find key
+	     s.find(*vit);
+	   avgcomps += countint::getcount() / (double)N;
+	   avgsquare += pow((countint::getcount() / (double)N),2);
+	   // s.delete();
+        }
+
+          avgcomps /= R;
+          avgsquare /= R;
+	  
+          //cout << "avgcomps " << avgcomps << "  avgsquare " << avgsquare << "  R " << R << endl;
+          stdDev = sqrt((avgsquare - pow(avgcomps,2))); //Finding standard deviation
+          //Printing out comparisons data
+          cout << N << "\t" << avgcomps << "\t" << stdDev << endl;
+      }
+      else if (structure == "set"){   
+         for (int i = 0; i < R; i ++) { //Do the following for R runs if SHUFFLED
+	   set<countint> s = set<countint>();
+	   v.clear();
+	   for (int i = 0; i < N; ++ i)
+	     v.push_back(i);
+	   //Randomize vector if required to insert keys SHUFFLED
+	   if (form == "shuffled")
+	     std::random_shuffle(v.begin(), v.end());
+    
+	   std::vector<countint>::iterator vit = v.begin();
+	   std::vector<countint>::iterator ven = v.end();
+
+	   for (vit = v.begin(); vit != ven; ++vit)
+	     s.insert(*vit);
+
+	   countint::clearcount();
+	   for (vit = v.begin(); vit != ven; ++ vit)  //How many comparisons on avg to find key
+	     s.find(*vit);
+	   avgcomps += countint::getcount() / (double)N;
+	   avgsquare += pow((countint::getcount() / (double)N),2);
+	   // s.delete();
+        }
+
+          avgcomps /= R;
+          avgsquare /= R;
+	  
+          //cout << "avgcomps " << avgcomps << "  avgsquare " << avgsquare << "  R " << R << endl;
+          stdDev = sqrt((avgsquare - pow(avgcomps,2))); //Finding standard deviation
+          //Printing out comparisons data
+          cout << N << "\t" << avgcomps << "\t" << stdDev << endl;
+      }
+      else
+         cout << "Wrong structure input." << endl;   
+    }
+    return 0;
+}
+
